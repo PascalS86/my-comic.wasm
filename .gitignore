@@ -3,6 +3,7 @@
 
 ### DotnetCore ###
 # .NET Core build folders
+/.vs
 /src/bin
 /src/obj
 
