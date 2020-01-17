@@ -1,0 +1,253 @@
+﻿@page "/"
+@using System.Linq
+@using Csandra.Comics.App.wasm.Data
+@using Radzen
+@inject ComicDataService ComicService
+@inject SessionService session
+@inject Radzen.DialogService dialogService
+@inject Microsoft.AspNetCore.Components.NavigationManager UriHelper
+
+<div class="signin-content p-4 py-5"> 
+    <div class="row mb-4">
+            <div class="col-sm">
+                <h2>
+                    <span class="small text-uppercase text-muted d-block">Übersicht</span>
+                </h2>
+            </div>
+            
+
+            <div class="col-sm text-sm-right">
+
+                <RadzenButton Click="@((args) => New(args, new ComicData()))" Text="Neu" Icon="add" Style="margin-bottom: 20px; width: 150px">
+
+                </RadzenButton>
+
+            </div>
+        </div>
+
+    @if(comics != null)
+    {
+
+    <div class="dashboard">
+        <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                    <h3 >Übersicht</h3>
+                    
+                    <div class="col-sm text-sm-right">
+                        <RadzenTextBox  Placeholder="Suche..." @bind-Value="@Search" Change="@(args => Search = args)"  Style="width: 62%"/>                                                        
+
+                        <RadzenButton Click="@((args) => BuildPattern())" Text="Suche" Icon="search" Style="float:right;">
+
+                        </RadzenButton>
+
+                    </div>
+                    </div>
+                    <div class="card-body">
+
+                        <div class="row">
+
+                            <div class="col-sm-12 col-md-6 col-lg text-success active-issues">
+                                <span style="cursor:pointer;" @onclick="@(()=> IsOpen = true)" class="comp-label">
+                                    <strong>@comiclist.Count(c=> c.Rating.GetValueOrDefault(0)<=0)</strong>
+                                    <small>Offene Comics</small>
+                                </span>
+                            </div>
+
+                            <div class="col-sm-12 col-md-6 col-lg text-danger closed-issues">
+                                <span style="cursor:pointer;" @onclick="@(()=> IsLent = true)" class="comp-label">
+                                    <strong>@comiclist.Count(c=> c.IsLent)</strong>
+                                    <small>Verliehene Comics</small>
+                                </span>
+                            </div>
+
+                            <div class="col-sm-12 col-md-6 col-lg open-issues">
+                                <span style="cursor:pointer;" @onclick="@(()=> IsKindle = true)" class="comp-label">
+                                    <strong>@comiclist.Count(c=> c.IsKindle)</strong>
+                                    <small>Kindle Comics</small>
+                                </span>
+                            </div>
+                            
+                        </div>
+                            <h3 class="card-header">All issues</h3>
+                            <div class="all-issues">
+                                <RadzenDataList WrapItems="true" AllowPaging="true" Data="@comiclist" TItem="ComicData">
+                                    <Template Context="comic">
+                                        <RadzenCard Style="width:300px;">
+                                            <div class="row" >
+                                                <div class="col-md-6">
+                                                    <div style="@(comic.IsLent?"color:#c90047;": null)">Comic:</div>
+                                                    <b  style="@(comic.IsLent?"color:#c90047;": null)">@comic.Title</b>
+                                                    <div style="margin-top:20px;@(comic.IsLent?"color:#c90047;": null)">Bewertung:</div>
+                                                    <b>@if(comic.Rating.GetValueOrDefault(0) > 0)
+                                                        {
+                                                        for(int i = 1; i < 11; i++)
+                                                        {
+                                                            if(i <= comic.Rating.GetValueOrDefault(0)){
+                                                                <span class="oi oi-star checked"></span>
+                                                            }
+                                                            else{
+                                                                <span class="oi oi-star"></span>
+                                                            }
+                                                        }
+                                                        
+                                                    }
+                                                    else{
+                                                        <span  style="@(comic.IsLent?"color:#c90047;": null)">Keine Bewertung</span>
+                                                    }</b>
+
+                                                    <br />
+                                                    <RadzenImage Path="@comic.PictureUri" Style="width:100px;" />
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div  style="@(comic.IsLent?"color:#c90047;": null)">ISBN:</div>
+                                                    <b  style="@(comic.IsLent?"color:#c90047;": null)">@comic.Isbn</b>
+                                                    <div style="margin-top:20px;@(comic.IsLent?"color:#c90047;": null)">Verliehen an?</div>
+                                                    <b  style="@(comic.IsLent?"color:#c90047;": null)">@(comic.LentTo)</b>
+                                                    <div style="margin-top:20px;@(comic.IsLent?"color:#c90047;": null)">Verliehen seit?</div>
+                                                    <b  style="@(comic.IsLent?"color:#c90047;": null)">@((comic.LentTo??"") != "" ? comic.LentSince.GetValueOrDefault(DateTime.Now).ToShortDateString(): "")</b>
+                                                </div>
+                                            </div>
+                                            
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <div  style="@(comic.IsLent?"color:#c90047;": null)">Summary:</div>
+                                                        <b  style="@(comic.IsLent?"color:#c90047;": null)">@comic.Summary</b>
+                                                    
+                                                    </div>
+
+                                                </div>
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <RadzenButton Click="@((args) => Edit(args, comic))" Text="Bearbeiten" Icon="edit" Style="margin-bottom: 20px; width: 150px" />
+                                                </div>
+                                            </div>
+
+                                        </RadzenCard>
+                                    </Template>
+                                </RadzenDataList>
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else{
+        <div class="loader"></div>
+    }
+</div>
+@code{
+    string Search {get;set;}
+    bool IsOpen{get;set;} = false;
+    bool IsLent{get;set;} = false;
+    bool IsKindle{get;set;} = false;
+    string rest = "";
+    ComicData selectedComic;
+
+    IEnumerable<ComicData> comiclist {get=> comics != null ?comics.Where(c=> IsValid(c)):Enumerable.Empty<ComicData>();}
+
+    List<ComicData> comics = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        session.SessionDataChanged += (s,e)=> {
+            StateHasChanged();
+            UriHelper.NavigateTo("/", !session.IsLoggedIn);
+            };
+		if(!session.IsLoggedIn){
+            UriHelper.NavigateTo("/signin");
+            return;
+        }
+        comics = await ComicService.GetComics(session.GetIdentifier());
+        
+        dialogService.OnOpen += Open;
+
+        dialogService.OnClose += Close;
+        Console.WriteLine(comics.Count);
+    }
+
+    async void BuildPattern(){
+        rest = Search;
+        if( rest == null ||rest == ""){
+            IsOpen = false;
+            IsLent = false;
+            IsKindle = false;
+        }
+        Console.WriteLine(comiclist.Count());
+        await InvokeAsync(()=> StateHasChanged());
+    }
+
+    bool IsValid(ComicData data){
+        if(data == null || rest == null ||rest == ""){
+            var b = true;
+            if(IsOpen)
+                b = b && data.Rating.GetValueOrDefault(0) <= 0;
+            if(IsLent)
+                b = b && data.IsLent;
+            if(IsKindle)
+                b = b && data.IsKindle;
+            return b;
+        }
+        else{
+            var b = (data.Isbn??"").Contains(rest) || (!string.IsNullOrEmpty(data.Isbn) && rest.Contains((data.Isbn??"")))
+                || (data.Title??"").Contains(rest) || (!string.IsNullOrEmpty(data.Title) && rest.Contains((data.Title??"")))
+                || (data.Summary??"").Contains(rest) || (!string.IsNullOrEmpty(data.Summary) && rest.Contains((data.Summary??"")))
+                || data.Rating.GetValueOrDefault(0).ToString().Contains(rest) ||rest.Contains(data.Rating.GetValueOrDefault(0).ToString())
+                || (data.LentTo??"").Contains(rest) || (!string.IsNullOrEmpty(data.LentTo) && rest.Contains((data.LentTo??"")));
+        
+            
+            if(IsOpen)
+                b = b && data.Rating.GetValueOrDefault(0) <= 0;
+            if(IsLent)
+                b = b && data.IsLent;
+            if(IsKindle)
+                b = b && data.IsKindle;
+            return b;
+        }
+    }
+
+    void Edit (MouseEventArgs args, ComicData data){
+        selectedComic = data;
+        dialogService.Open<Editor>($"{data.Title}",
+            new Dictionary<string, object>() { { "comic", data } },
+            new DialogOptions(){ Width = "700px", Height = "630px", Left = "30%", Top = "20%" });
+    }
+
+    void New (MouseEventArgs args, ComicData data){
+        selectedComic = data;
+        ComicService.Save(data, session.GetIdentifier());
+        comics.Add(data);
+        dialogService.Open<Editor>($"Neuer Comic",
+            new Dictionary<string, object>() { { "comic", data } },
+            new DialogOptions(){ Width = "700px", Height = "630px", Left = "30%", Top = "20%" });
+    }
+    
+
+    async void Open(string title, Type type, Dictionary<string, object> parameters, DialogOptions options)
+    {
+        await InvokeAsync(() => { StateHasChanged(); });
+    }
+
+
+
+    async void Close(dynamic result)
+    {
+        try{
+            Console.WriteLine("Comicrating: "+((ComicData)result).Rating.ToString());
+            Console.WriteLine("Comicrating: "+((ComicData)result).EditableRating.ToString());
+            for(int i = 0; i < comics.Count; i++){
+                if(comics[i].Title == ((ComicData)result).Title){
+                    comics[i] = ((ComicData)result);
+                    break;
+                }
+            }
+            ComicService.Save((ComicData)result,session.GetIdentifier());
+            
+            await InvokeAsync(() => { StateHasChanged(); });
+        }
+        catch{
+
+        }
+        finally{}
+    }
+}

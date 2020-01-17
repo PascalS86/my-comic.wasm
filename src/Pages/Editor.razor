@@ -1,0 +1,68 @@
+@page "/editor/{comic}"
+
+@using Csandra.Comics.App.wasm.Data
+@inject ComicDataService ComicService
+
+@inject Radzen.DialogService dialogService
+
+<RadzenCard>
+    <div class="row" >
+        <div class="col-md-6">
+            <div style="@(comic.IsLent?"color:#c90047;": null)">Comic:</div>
+            <b  style="@(comic.IsLent?"color:#c90047;": null)">
+                <RadzenTextBox @bind-Value="@comic.Title" Placeholder="Titel..." Change="@(args => comic.Title = args)" /></b>
+            <div style="margin-top:20px;@(comic.IsLent?"color:#c90047;": null)">Bewertung:</div>
+            <b>
+                <RadzenNumeric TItem="int" Placeholder="Comic bewerten..." @bind-Value="@comic.EditableRating" Min="0" Max="10" /></b>
+
+            <br />
+            <RadzenImage Path="@comic.PictureUri" Style="width:100px;" />
+            <br />
+            <b>
+                <RadzenTextBox  Placeholder="Bildquelle..." @bind-Value="@comic.PictureUri" Change="@(args => comic.PictureUri = args)" />                    
+            </b>
+        </div>
+        <div class="col-md-6">
+            <div  style="@(comic.IsLent?"color:#c90047;": null)">ISBN:</div>
+            <b  style="@(comic.IsLent?"color:#c90047;": null)">
+                <RadzenTextBox  Placeholder="Isbn..." @bind-Value="@comic.Isbn" Change="@(args => comic.Isbn = args)" /></b>
+            <div style="margin-top:20px;@(comic.IsLent?"color:#c90047;": null)">Verliehen an?</div>
+            <b  style="@(comic.IsLent?"color:#c90047;": null)">
+                <RadzenTextBox  Placeholder="Verliehen an..." @bind-Value="@comic.LentTo" Change="@(args => {comic.LentTo = args; comic.IsLent = comic.LentTo != "";  })" /></b>
+            <div style="margin-top:20px;@(comic.IsLent?"color:#c90047;": null)">Verliehen seit?</div>
+            <b  style="@(comic.IsLent?"color:#c90047;": null)"><RadzenDatePicker @bind-Value="comic.LentSince" Change="@(args => comic.LentSince = args)" /></b>
+        </div>
+    </div>
+    
+        <div class="row">
+            <div class="col-md-12">
+                <div  style="@(comic.IsLent?"color:#c90047;": null)">Summary:</div>
+                 <b  style="@(comic.IsLent?"color:#c90047;": null)">
+                     <RadzenTextArea Rows="5" @bind-Value="@comic.Summary" Placeholder="Summary..." Change="@(args => comic.Summary = args)" Style="margin-bottom: 20px;width:100%;" />
+                     </b>
+            
+            </div>
+
+        </div>
+    <div class="row">
+        <div class="col-md-12">
+            
+            <RadzenButton Click="@((args) => dialogService.Close(comic))" Text="OK" Style="margin-bottom: 10px; width: 150px" />
+            <RadzenButton Click="@((args) => dialogService.Close(comic))" ButtonStyle="ButtonStyle.Secondary" Text="Cancel" Style="margin-bottom: 10px; width: 150px" />
+        </div>
+    </div>
+
+</RadzenCard>
+
+
+@code {
+    [Parameter] public ComicData comic { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await InvokeAsync(() =>
+        {
+            StateHasChanged();
+        });
+    }
+}
