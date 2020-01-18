@@ -10,14 +10,20 @@
 	<h1 id="app-title"><img src="assets/logo.svg"></h1>
 	<p id="app-subtitle">Csandra Stores</p>
 	<hr />
-	@if(session.IsLoggedIn){
+	
 	<p class="h4 mt-5">Comics</p>
+	@if(!session.IsLoggedIn){
 	<ul class="nav nav-pills flex-column">
 		<li class="nav-item" id="dashbaord">
-			<NavLink class="@(IsAtRoot() ? "nav-link active" : "nav-link")" href="">Issues</NavLink>
+			<NavLink class="@(IsAtRoot() ? "nav-link active" : "nav-link")" style="background:transparent" href="signin">Start</NavLink>
 		</li>
 	</ul>
 	}
+	<ul class="nav nav-pills flex-column">
+		<li class="nav-item" id="dashbaord">
+			<NavLink class="@(IsAtRoot() ? "nav-link active" : "nav-link")" style="@(session.IsLoggedIn?"":"background:transparent")" href="@(session.IsLoggedIn?"":"issues")">Issues</NavLink>
+		</li>
+	</ul>
 	<p class="h4 mt-5">Account</p>
 	<ul class="nav nav-pills flex-column">
 		@if(session.IsLoggedIn){

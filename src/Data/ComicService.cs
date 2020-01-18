@@ -11,7 +11,7 @@ namespace Csandra.Comics.App.wasm.Data
 {
     public class ComicDataService
     {   
-        private readonly string apiUri = "https://xq2izutcxg.execute-api.eu-west-1.amazonaws.com/Prod";
+        private readonly string apiUri = "";
         public static readonly string[] Genres = new[]{
             "SciFi", "Action", "Adventure", 
             "Thriller", "Romance", "Crime", 
@@ -20,13 +20,11 @@ namespace Csandra.Comics.App.wasm.Data
             "Martial Arts", "Mystery", "Pirate",
             "Spy", "Sports"
         };
-
-        public async Task<List<ComicData>> GetComics (string client=""){
+       
+        public async Task<List<ComicData>> GetComics (){
            try{
-                if(string.IsNullOrWhiteSpace(client))
-                    throw new UnauthorizedAccessException();
-                 using(var httpClient = new HttpClient()){
-                    var response = await  httpClient.GetAsync($"{apiUri}?client={client}");
+                using(var httpClient = new HttpClient()){
+                    var response = await  httpClient.GetAsync($"{apiUri}");
                     if(response.IsSuccessStatusCode){
                         var json = await response.Content.ReadAsStringAsync();
                         
@@ -66,6 +64,9 @@ namespace Csandra.Comics.App.wasm.Data
                Console.WriteLine(ex.Message);
            }
         }
+
+        
+        internal string GetAPI()=> apiUri;
  
     }
 }

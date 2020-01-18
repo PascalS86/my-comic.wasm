@@ -1,4 +1,5 @@
 ﻿@page "/"
+@page "/issues"
 @using System.Linq
 @using Csandra.Comics.App.wasm.Data
 @using Radzen
@@ -15,7 +16,7 @@
                 </h2>
             </div>
             
-
+            @if(session.CanChange){
             <div class="col-sm text-sm-right">
 
                 <RadzenButton Click="@((args) => New(args, new ComicData()))" Text="Neu" Icon="add" Style="margin-bottom: 20px; width: 150px">
@@ -23,6 +24,7 @@
                 </RadzenButton>
 
             </div>
+            }
         </div>
 
     @if(comics != null)
@@ -102,10 +104,12 @@
                                                 <div class="col-md-6">
                                                     <div  style="@(comic.IsLent?"color:#c90047;": null)">ISBN:</div>
                                                     <b  style="@(comic.IsLent?"color:#c90047;": null)">@comic.Isbn</b>
+                                                    @if(session.CanChange){
                                                     <div style="margin-top:20px;@(comic.IsLent?"color:#c90047;": null)">Verliehen an?</div>
                                                     <b  style="@(comic.IsLent?"color:#c90047;": null)">@(comic.LentTo)</b>
                                                     <div style="margin-top:20px;@(comic.IsLent?"color:#c90047;": null)">Verliehen seit?</div>
                                                     <b  style="@(comic.IsLent?"color:#c90047;": null)">@((comic.LentTo??"") != "" ? comic.LentSince.GetValueOrDefault(DateTime.Now).ToShortDateString(): "")</b>
+                                                    }
                                                 </div>
                                             </div>
                                             
@@ -117,11 +121,13 @@
                                                     </div>
 
                                                 </div>
+                                            @if(session.CanChange){
                                             <div class="row">
                                                 <div class="col-md-12">
                                                     <RadzenButton Click="@((args) => Edit(args, comic))" Text="Bearbeiten" Icon="edit" Style="margin-bottom: 20px; width: 150px" />
                                                 </div>
                                             </div>
+                                            }
 
                                         </RadzenCard>
                                     </Template>
@@ -154,11 +160,13 @@
             StateHasChanged();
             UriHelper.NavigateTo("/", !session.IsLoggedIn);
             };
-		if(!session.IsLoggedIn){
+        string currUrl = UriHelper.Uri;
+		
+		if(!session.IsLoggedIn && !currUrl.EndsWith("/issues")){
             UriHelper.NavigateTo("/signin");
             return;
         }
-        comics = await ComicService.GetComics(session.GetIdentifier());
+        comics = await ComicService.GetComics();
         
         dialogService.OnOpen += Open;
 
