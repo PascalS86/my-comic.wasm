@@ -11,5 +11,7 @@
 /src/node_modules
 /src/wwwroot/node_modules
 
+# others
+/deploy.txt
 
 # End of https://www.gitignore.io/api/dotnetcore

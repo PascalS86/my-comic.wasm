@@ -2,7 +2,7 @@
 // configuration to initialize msal
 const msalConfig = {
     auth: {
-        clientId: "0efb2d7a-7fd5-4c94-a17e-c4fd8fd839ed", //This is your client ID
+        clientId: "", //This is your client ID
         authority: "https://login.microsoftonline.com/common", //This is your tenant info
         redirectURI: "http://localhost:5000/"
     },
