@@ -1,0 +1,36 @@
+name: .NET Core
+
+on: [push] #on push to your branch run this workflow
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Replace Token
+    - uses: cschleiden/replace-tokens@v1.0
+      with:
+        tokenPrefix: '@@@'
+        tokenSuffix: '@@@'
+      env:
+        API_ACCESS:  ${{ secrets.API_ACCESS }}
+        CLIENT_ID:  ${{ secrets.CLIENT_ID }}
+        REDIRECT_URI:  ${{ secrets.REDIRECT_URI }}
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.101 #Blazor WebAssembly requires 3.1.100 or higher
+    - name: Build with dotnet
+      working-directory: ./src
+      run: dotnet build --configuration Release
+    - name: Publish Blazor webassembly using dotnet #create Blazor WebAssembly dist output folder in the project directory
+      working-directory: ./src
+      run: dotnet publish -c Release --no-build -o ./../
+    - name: Publish generated Blazor webassembly to Netlify
+      uses: netlify/actions/cli@master #uses Netlify Cli actions
+      env: # these environment variables are added in github secrets
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_APP_ID: ${{ secrets.NETLIFY_APP_ID }}
+      with:
+          args: deploy --dir=Csandra.Comics.App.wasm/dist/ --prod #push dist folder to Netlify
+          secrets: '["NETLIFY_AUTH_TOKEN", "NETLIFY_APP_ID"]'
