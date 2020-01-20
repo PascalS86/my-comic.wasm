@@ -11,7 +11,7 @@ namespace Csandra.Comics.App.wasm.Data
 {
     public class ComicDataService
     {   
-        private readonly string apiUri = "";
+        private readonly string apiUri = "@@@API_ACCESS@@@";
         public static readonly string[] Genres = new[]{
             "SciFi", "Action", "Adventure", 
             "Thriller", "Romance", "Crime", 
