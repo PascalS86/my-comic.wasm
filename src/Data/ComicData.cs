@@ -22,6 +22,6 @@ namespace Csandra.Comics.App.wasm.Data
         public int? Rating { get; set; } = 0;
         public int EditableRating { get=> Rating.GetValueOrDefault(0); set=> Rating = value; } 
         public string Genres { get; set; }
-        public string Tags { get; set; }
+        public string Tags { get; set; } 
     }
 }
