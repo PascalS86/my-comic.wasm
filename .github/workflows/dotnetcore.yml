@@ -10,16 +10,16 @@ jobs:
     - name: Replace Token
     - uses: cschleiden/replace-tokens@v1.0
       with:
-        tokenPrefix: '@@@'
-        tokenSuffix: '@@@'
+          tokenPrefix: '@@@'
+          tokenSuffix: '@@@'
       env:
-        API_ACCESS:  ${{ secrets.API_ACCESS }}
-        CLIENT_ID:  ${{ secrets.CLIENT_ID }}
-        REDIRECT_URI:  ${{ secrets.REDIRECT_URI }}
+          API_ACCESS:  ${{ secrets.API_ACCESS }}
+          CLIENT_ID:  ${{ secrets.CLIENT_ID }}
+          REDIRECT_URI:  ${{ secrets.REDIRECT_URI }}
     - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
+    - uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 3.1.101 #Blazor WebAssembly requires 3.1.100 or higher
+          dotnet-version: 3.1.101 #Blazor WebAssembly requires 3.1.100 or higher
     - name: Build with dotnet
       working-directory: ./src
       run: dotnet build --configuration Release
