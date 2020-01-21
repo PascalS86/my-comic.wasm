@@ -30,7 +30,7 @@ jobs:
         uses: netlify/actions/cli@master #uses Netlify Cli actions
         env: # these environment variables are added in github secrets
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_APP_ID: ${{ secrets.NETLIFY_APP_ID }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_APP_ID }}
         with:
           args: deploy --dir=my-comic.wasm/src/dist/ --prod #push dist folder to Netlify
-          secrets: '["NETLIFY_AUTH_TOKEN", "NETLIFY_APP_ID"]'
+          secrets: '["NETLIFY_AUTH_TOKEN", "NETLIFY_SITE_ID"]'
