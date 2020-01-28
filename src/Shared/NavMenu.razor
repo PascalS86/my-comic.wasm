@@ -1,7 +1,6 @@
 ﻿@using Csandra.Comics.App.wasm.Data
 @inject NavigationManager UriHelper
 @inject SessionService session
-
 <div id="nav"
 	class="col-xs-3 bg-dark text-white py-5 k-vbox @( !collapseNavMenu ? "expand" : "" )">
 	<span id="nav-toggle" class="nav-toggle d-md-none" @onclick="@ToggleNavMenu">
